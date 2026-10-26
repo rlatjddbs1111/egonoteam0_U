@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>카카오톡 할 일 찾기 실험</title>
-    <!-- Tailwind CSS -->
+    <title>할 일 찾기 실험 (A/B Test)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome 아이콘 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -21,12 +19,11 @@
             max-width: 412px;
             height: 100vh;
             max-height: 870px;
-            background-color: #000000; /* 완벽한 다크모드 블랙 */
+            background-color: #000000;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             margin: 0 auto;
         }
         .chat-scroll {
@@ -34,79 +31,89 @@
             flex: 1;
             padding-bottom: 70px; /* 하단바 공간 */
         }
-        .chat-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        /* 프로필 이미지 (그룹/개인) */
-        .profile-img {
-            width: 44px;
-            height: 44px;
+        .chat-scroll::-webkit-scrollbar { display: none; }
+        
+        /* 프로필 이미지 스타일 */
+        .profile-single {
+            width: 44px; height: 44px;
             border-radius: 18px;
-            background-color: #2c2c2c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-            overflow: hidden;
+            background-color: #8c8c8c;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0; overflow: hidden;
         }
+        .profile-group {
+            width: 44px; height: 44px;
+            border-radius: 18px;
+            background-color: transparent;
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 2px;
+            flex-shrink: 0; overflow: hidden;
+        }
+        .group-item { background-color: #8c8c8c; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+        
         /* 오터치 에러 애니메이션 */
         @keyframes flashRed {
-            0% { background-color: rgba(220, 38, 38, 0.5); }
+            0% { background-color: rgba(220, 38, 38, 0.4); }
             100% { background-color: transparent; }
         }
-        .flash-error {
-            animation: flashRed 0.3s ease-out;
-        }
-        /* 카카오톡 하단바 고정 */
+        .flash-error { animation: flashRed 0.3s ease-out; }
+        
+        /* 하단바 */
         .bottom-nav {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #000000;
-            border-top: 1px solid #1a1a1a;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            color: #555555;
-            font-size: 24px;
-            z-index: 10;
+            position: absolute; bottom: 0; width: 100%; height: 60px;
+            background-color: #000000; border-top: 1px solid #1a1a1a;
+            display: flex; justify-content: space-around; align-items: center;
+            color: #555555; font-size: 22px; z-index: 10;
         }
     </style>
 </head>
 <body class="flex justify-center items-center min-h-screen p-0 m-0 bg-gray-900">
 
 <div id="app" class="mobile-container">
-    <!-- 화면 1: 실험 안내 화면 (디자인 심플하게 유지) -->
+    
+    <!-- [화면 1] 실험 안내 화면 -->
     <div id="screen-intro" class="flex flex-col justify-center items-center h-full p-6 text-center bg-gray-900 z-50 absolute w-full inset-0">
-        <i class="fa-solid fa-stopwatch text-yellow-400 text-5xl mb-6"></i>
-        <h1 class="text-2xl font-bold mb-2">할 일 찾기 테스트</h1>
-        <p class="text-gray-400 text-sm mb-8 leading-relaxed">
-            카톡 목록에서 <strong class="text-yellow-400">'할 일'이 부여된 방</strong>을 찾아<br>최대한 빨리 터치하세요.<br>
-            (총 2회 무작위 진행)
-        </p>
-        <button onclick="startExperiment()" class="w-full max-w-[280px] bg-yellow-400 text-black font-bold py-4 rounded-xl text-lg active:scale-95 transition-transform">
-            실험 시작
+        <div class="mb-8">
+            <span class="bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block">인간공학 UI 검증 과제</span>
+            <h1 class="text-2xl font-bold mb-2">할 일 찾기 실험</h1>
+            <p class="text-gray-400 text-sm leading-relaxed">
+                카카오톡 채팅방 목록에 숨겨진<br>
+                <strong class="text-white">'할 일'이 부여된 방</strong>을 최대한 빨리 찾아서 누르세요.<br>
+                (2가지 버전이 랜덤하게 2회 진행됩니다)
+            </p>
+        </div>
+        <button onclick="startExperiment()" class="w-full max-w-[280px] bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 rounded-xl text-lg active:scale-95 transition-transform shadow-lg">
+            실험 시작하기
         </button>
-        <div id="ip-display" class="mt-4 text-[10px] text-gray-600">IP 수집 중...</div>
+        <div id="ip-display" class="mt-4 text-[10px] text-gray-500">IP 수집 중...</div>
     </div>
 
-    <!-- 화면 2: 진짜 카카오톡 메인 화면 -->
+    <!-- [화면 2] 카카오톡 메인 화면 (다크모드 복제) -->
     <div id="screen-test" class="hidden h-full flex flex-col w-full relative">
-        <!-- 상단 실험 안내 바 (작게 배치) -->
+        <!-- 상단 실험 안내 바 -->
         <div class="bg-blue-600/90 text-white text-[11px] font-bold text-center py-1 absolute w-full z-20 top-0 flex justify-between px-4">
             <span id="test-step-label">진행 상황</span>
             <span>최대한 빨리 찾아서 누르세요!</span>
         </div>
 
+        <!-- 가짜 iOS 상태표시줄 -->
+        <div class="px-5 pt-7 pb-1 flex justify-between items-center bg-[#000000] z-10 text-[12px] font-semibold">
+            <span>12:05</span>
+            <div class="flex items-center space-x-1.5">
+                <i class="fa-solid fa-signal text-[10px]"></i>
+                <span class="text-[10px]">LTE</span>
+                <div class="flex items-center border border-white rounded-[4px] px-1 w-[22px] h-[11px] relative">
+                    <span class="text-[8px] leading-none absolute left-0.5 top-[1px]">24</span>
+                    <div class="w-[2px] h-[4px] bg-white absolute -right-[3px] rounded-r-sm"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- 카톡 헤더 -->
-        <div class="px-5 pt-8 pb-3 flex justify-between items-center bg-[#000000] z-10">
+        <div class="px-5 pb-3 pt-1 flex justify-between items-center bg-[#000000] z-10">
             <h1 class="text-[22px] font-bold">채팅</h1>
-            <div class="flex items-center space-x-4 text-[20px] text-gray-100">
+            <div class="flex items-center space-x-4 text-[20px] text-gray-200">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <i class="fa-regular fa-comment-dots"></i>
-                <i class="fa-regular fa-folder-open"></i>
+                <i class="fa-regular fa-comment-medical"></i>
                 <i class="fa-solid fa-gear"></i>
             </div>
         </div>
@@ -114,22 +121,28 @@
         <!-- 카톡 필터 태그 -->
         <div class="px-4 pb-3 flex space-x-2 overflow-x-auto text-[13px] whitespace-nowrap scrollbar-hide bg-[#000000] z-10">
             <span class="bg-white text-black px-3 py-1.5 rounded-full font-bold">전체</span>
-            <span class="bg-[#252525] text-gray-200 px-3 py-1.5 rounded-full flex items-center">
+            <span class="bg-[#1c1c1e] text-gray-200 px-3 py-1.5 rounded-full flex items-center border border-gray-800">
                 안읽음 <span id="total-unread-badge" class="bg-[#eb4b4b] text-white text-[11px] px-1.5 py-0.5 rounded-full ml-1.5 font-bold">0</span>
             </span>
-            <span class="bg-[#252525] text-gray-200 px-3 py-1.5 rounded-full">ChatGPT</span>
-            <span class="bg-[#252525] text-gray-200 px-3 py-1.5 rounded-full">통화</span>
+            <span class="bg-[#1c1c1e] text-gray-200 px-3 py-1.5 rounded-full border border-gray-800">ChatGPT</span>
+            <span class="bg-[#1c1c1e] text-gray-200 px-3 py-1.5 rounded-full border border-gray-800">통화</span>
+            <span class="bg-[#1c1c1e] text-gray-200 px-3 py-1.5 rounded-full border border-gray-800 flex items-center justify-center relative">
+                <i class="fa-solid fa-bars-staggered"></i><span class="absolute top-1 right-1.5 w-1 h-1 bg-[#eb4b4b] rounded-full"></span>
+            </span>
         </div>
 
-        <!-- 냥코 대전쟁 느낌의 흰색 광고 배너 -->
-        <div class="mx-4 my-1 p-3 bg-white rounded-xl flex items-center justify-between z-10">
-            <div>
-                <span class="text-[9px] text-gray-400 border border-gray-300 px-1 rounded">AD</span>
-                <p class="text-[13px] font-extrabold text-black mt-1">1억 2000만 이벤트 개최 중!</p>
-                <p class="text-[10px] text-gray-500">확률형 아이템 포함</p>
+        <!-- 몬스터헌터 광고 배너 복제 -->
+        <div class="mx-4 my-1 p-3 bg-[#f5f5f5] rounded-xl flex items-center justify-between z-10">
+            <div class="flex flex-col">
+                <div class="flex items-center space-x-1 mb-1">
+                    <span class="text-[8px] text-gray-400 border border-gray-300 px-1 rounded">AD</span>
+                    <span class="text-[10px] text-gray-500">몬스터헌터 아웃랜더스 앱 사전예약하기 ></span>
+                </div>
+                <p class="text-[14px] font-extrabold text-black tracking-tight">모험가여, 사냥할 시간이다!</p>
+                <p class="text-[9px] text-gray-400 mt-0.5">확률형 아이템 포함</p>
             </div>
-            <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center text-xl border border-gray-200">
-                🐱
+            <div class="w-[70px] h-[35px] flex items-center justify-center">
+                <span class="text-black font-black italic text-xs tracking-tighter">MONSTER HUNTER</span>
             </div>
         </div>
 
@@ -141,35 +154,42 @@
             <i class="fa-regular fa-user"></i>
             <div class="relative text-white">
                 <i class="fa-solid fa-comment"></i>
-                <span id="bottom-badge" class="absolute -top-1 -right-2 bg-[#eb4b4b] text-[9px] font-bold px-1 rounded-full border border-black">0</span>
+                <span id="bottom-badge" class="absolute -top-1 -right-2 bg-[#eb4b4b] text-[10px] font-bold px-1.5 rounded-full border border-black">0</span>
             </div>
-            <i class="fa-regular fa-comments"></i>
+            <div class="relative">
+                <i class="fa-regular fa-comments"></i>
+                <span class="absolute -top-1 -right-2 bg-[#eb4b4b] text-[10px] font-bold px-1.5 rounded-full border border-black">2</span>
+            </div>
             <i class="fa-solid fa-bag-shopping"></i>
             <i class="fa-solid fa-ellipsis"></i>
         </div>
     </div>
 
-    <!-- 화면 3: 완료 화면 -->
+    <!-- [화면 3] 완료 화면 -->
     <div id="screen-result" class="hidden flex flex-col justify-center items-center h-full p-6 text-center bg-gray-900 z-50 absolute w-full inset-0">
-        <i class="fa-solid fa-clipboard-check text-green-400 text-5xl mb-4"></i>
-        <h1 class="text-2xl font-bold mb-6">실험 완료</h1>
+        <i class="fa-solid fa-square-poll-vertical text-green-400 text-5xl mb-4"></i>
+        <h1 class="text-2xl font-bold mb-6">실험 완료!</h1>
         
-        <div class="w-full bg-gray-800 p-5 rounded-xl text-left border border-gray-700 space-y-3 mb-6">
+        <div class="w-full bg-gray-800 p-5 rounded-xl text-left border border-gray-700 space-y-3 mb-6 shadow-xl">
             <div class="flex justify-between items-center pb-2 border-b border-gray-700">
-                <span class="text-gray-400 text-sm">A안 (텍스트 탐색)</span>
+                <span class="text-gray-400 text-sm">A안 (기존/텍스트)</span>
                 <span id="res-time-a" class="font-bold text-yellow-400">0.00초</span>
             </div>
             <div class="flex justify-between items-center pb-2 border-b border-gray-700">
-                <span class="text-gray-400 text-sm">B안 (아이콘 탐색)</span>
+                <span class="text-gray-400 text-sm">B안 (개선/아이콘)</span>
                 <span id="res-time-b" class="font-bold text-blue-400">0.00초</span>
             </div>
-            <div id="db-status" class="text-[11px] text-center text-gray-500 pt-2">
-                데이터 저장 중...
+            <div class="flex justify-between items-center pt-1">
+                <span class="text-gray-500 text-xs">실험 순서 통제</span>
+                <span id="res-order" class="text-gray-400 text-xs">A ➔ B</span>
+            </div>
+            <div id="db-status" class="text-[11px] text-center text-gray-500 pt-3 border-t border-gray-700 mt-2">
+                데이터 서버 전송 중...
             </div>
         </div>
 
-        <button onclick="resetApp()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3.5 rounded-xl text-sm transition-colors">
-            처음으로 (새로운 참가자)
+        <button onclick="resetApp()" class="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl text-sm transition-colors active:scale-95">
+            처음으로 (다음 참가자 진행)
         </button>
     </div>
 </div>
@@ -184,7 +204,6 @@
     let resultB = { time: 0, errors: 0 };
     let currentErrorCount = 0;
 
-    // IP 수집
     fetch('https://api.ipify.org?format=json')
         .then(res => res.json())
         .then(data => {
@@ -192,20 +211,33 @@
             document.getElementById('ip-display').innerText = `접속 IP: ${userIP}`;
         }).catch(() => {});
 
-    // 리얼하게 바뀐 채팅방 데이터 (엄마 삭제, 조별과제/알바/친구 이름 추가)
+    // 익명화 및 현실성을 반영한 채팅방 데이터
     const baseChats = [
-        { id: 1, name: "GS25 주말오전 알바/대타", preview: "이번주 토요일 오전 대타 가능하신분 ㅠㅠ", time: "어제", badge: 1, avatar: "🏪" },
-        { id: 2, name: "인간공학 3조 조별과제", preview: "네 알겠습니다. 교수님 공지 확인했어요.", time: "어제", badge: 5, avatar: "👥" },
-        { id: 3, name: "과학생회 임원진", preview: "영수증 처리 오늘까지 꼭 부탁드려요", time: "어제", badge: 12, avatar: "🏢" },
-        { id: 4, name: "김민수", preview: "ㅇㅇ 이따 롤 한판 ㄱ?", time: "오후 10:25", badge: 0, avatar: "👦" },
-        { id: 5, name: "이서연", preview: "응", time: "어제", badge: 0, avatar: "👧" },
-        { id: 6, name: "박지훈", preview: "ㅋㅋㅋㅋ 미쳤냐고", time: "어제", badge: 0, avatar: "👨" },
-        { id: 7, name: "알고리즘 스터디", preview: "백준 1004번 문제 질문있습니다", time: "10월 23일", badge: 4, avatar: "📚" },
-        { id: 8, name: "최동현", preview: "오늘 저녁 뭐먹을래", time: "10월 23일", badge: 0, avatar: "👤" },
-        { id: 9, name: "정수빈", preview: "사진을 보냈습니다.", time: "10월 22일", badge: 1, avatar: "👩‍🦰" }
+        { id: 1, name: "이서연", preview: "사진을 보냈습니다.", time: "어제", badge: 0, type: 'single' },
+        { id: 2, name: "인간공학 3조 조별과제", preview: "이모티콘을 보냈습니다.", time: "어제", badge: 0, type: 'group' },
+        { id: 3, name: "GS25 주말오전 알바", preview: "이모티콘을 보냈습니다.", time: "어제", badge: 0, type: 'single' },
+        { id: 4, name: "최동현", preview: "파일: 인간공학_최종발표자료.pdf", time: "어제", badge: 0, type: 'single' },
+        { id: 5, name: "과학생회 임원진", preview: "네", time: "10월 25일", badge: 0, type: 'group' },
+        { id: 6, name: "김민수", preview: "저 사람?", time: "10월 25일", badge: 0, type: 'single' },
+        { id: 7, name: "알고리즘 스터디", preview: "건강 조심하셔요..", time: "10월 24일", badge: 0, type: 'group' },
+        { id: 8, name: "교내 취업지원센터", preview: "하반기 공채 대비 특강 안내", time: "10월 15일", badge: 0, type: 'single' }
     ];
 
     let targetChatId = null;
+
+    function getAvatarHTML(type) {
+        if (type === 'single') {
+            return `<div class="profile-single"><i class="fa-solid fa-user text-gray-400"></i></div>`;
+        } else {
+            return `
+            <div class="profile-group">
+                <div class="group-item"><i class="fa-solid fa-user text-gray-300"></i></div>
+                <div class="group-item"><i class="fa-solid fa-user text-gray-300"></i></div>
+                <div class="group-item"><i class="fa-solid fa-user text-gray-300"></i></div>
+                <div class="group-item"><i class="fa-solid fa-user text-gray-300"></i></div>
+            </div>`;
+        }
+    }
 
     function startExperiment() {
         testOrder = Math.random() < 0.5 ? 'AB' : 'BA';
@@ -234,7 +266,7 @@
         const listEl = document.getElementById('chat-list');
         listEl.innerHTML = '';
 
-        let calculatedTotalUnread = 0; // 안읽음 숫자 합계 계산용
+        let calculatedTotalUnread = 0;
 
         baseChats.forEach(chat => {
             const isTarget = (chat.id === targetChatId);
@@ -242,19 +274,18 @@
             let showIcon = false;
             let currentBadge = chat.badge;
 
-            // 타겟(정답) 채팅방 내용 변경
+            // 실험 타겟 세팅
             if (isTarget) {
                 if (testType === 'A') {
                     previewText = `[할 일] 자료조사 및 PPT 초안 작성`;
-                    currentBadge = currentBadge === 0 ? 1 : currentBadge; // A안도 안읽은 상태로 만듦
+                    currentBadge = 1; // A안 안읽음 뱃지 부여
                 } else {
                     previewText = `자료조사 및 PPT 초안 작성 부탁드립니다.`;
-                    currentBadge = currentBadge === 0 ? 1 : currentBadge;
+                    currentBadge = 1; // B안 안읽음 뱃지 부여
                     showIcon = true;
                 }
             }
 
-            // 총 안읽음 뱃지 계산
             calculatedTotalUnread += currentBadge;
 
             const item = document.createElement('div');
@@ -262,17 +293,17 @@
             item.onclick = (e) => handleChatClick(isTarget, e);
 
             item.innerHTML = `
-                <div class="flex items-center space-x-3 overflow-hidden pointer-events-none w-full">
-                    <div class="profile-img">${chat.avatar}</div>
-                    <div class="overflow-hidden flex-1">
+                <div class="flex items-center space-x-3 overflow-hidden w-full pointer-events-none">
+                    ${getAvatarHTML(chat.type)}
+                    <div class="overflow-hidden flex-1 pl-1">
                         <div class="font-bold text-[15px] text-gray-100 truncate mb-0.5">${chat.name}</div>
                         <div class="text-[13px] text-[#8c8c8c] truncate ${isTarget && testType==='A' ? 'text-white font-medium' : ''}">${previewText}</div>
                     </div>
                     <div class="flex flex-col items-end justify-start h-full pl-2">
                         <span class="text-[11px] text-[#8c8c8c] mb-1.5">${chat.time}</span>
                         <div class="flex items-center space-x-1.5">
-                            ${showIcon ? '<span class="bg-[#eb4b4b] text-white p-1 rounded border border-red-800 text-[10px] animate-pulse"><i class="fa-solid fa-check"></i> 할일</span>' : ''}
-                            ${currentBadge > 0 && !showIcon ? `<span class="bg-[#eb4b4b] text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full">${currentBadge > 99 ? '99+' : currentBadge}</span>` : ''}
+                            ${showIcon ? '<span class="bg-[#2b64d6] text-white px-1.5 py-0.5 rounded border border-blue-800 text-[10px] animate-pulse flex items-center shadow-[0_0_8px_rgba(43,100,214,0.6)]"><i class="fa-solid fa-check mr-1"></i>할일</span>' : ''}
+                            ${currentBadge > 0 && !showIcon ? `<span class="bg-[#eb4b4b] text-white text-[11px] font-bold px-1.5 py-[1px] rounded-full">${currentBadge}</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -280,9 +311,10 @@
             listEl.appendChild(item);
         });
 
-        // 상단 '안읽음' 필터와 하단 탭바 뱃지에 실제 합계 적용
-        document.getElementById('total-unread-badge').innerText = calculatedTotalUnread > 999 ? '999+' : calculatedTotalUnread;
-        document.getElementById('bottom-badge').innerText = calculatedTotalUnread > 999 ? '999+' : calculatedTotalUnread;
+        // 상/하단 안읽음 뱃지 동기화 (화면에 보이는 숫자만큼만)
+        const unreadDisplay = calculatedTotalUnread > 999 ? '999+' : calculatedTotalUnread;
+        document.getElementById('total-unread-badge').innerText = unreadDisplay;
+        document.getElementById('bottom-badge').innerText = unreadDisplay;
     }
 
     function handleChatClick(isTarget, e) {
@@ -307,9 +339,7 @@
             currentErrorCount++;
             const container = document.getElementById('screen-test');
             container.classList.add('flash-error');
-            setTimeout(() => {
-                container.classList.remove('flash-error');
-            }, 300);
+            setTimeout(() => { container.classList.remove('flash-error'); }, 300);
         }
     }
 
@@ -319,6 +349,7 @@
 
         document.getElementById('res-time-a').innerText = `${resultA.time}초 (오터치 ${resultA.errors}회)`;
         document.getElementById('res-time-b').innerText = `${resultB.time}초 (오터치 ${resultB.errors}회)`;
+        document.getElementById('res-order').innerText = `${testOrder[0]} ➔ ${testOrder[1]}`;
 
         const payload = {
             ip: userIP,
@@ -330,9 +361,7 @@
             userAgent: navigator.userAgent
         };
 
-        if (window.saveToFirebase) {
-            window.saveToFirebase(payload);
-        }
+        if (window.saveToFirebase) { window.saveToFirebase(payload); }
     }
 
     function resetApp() {
@@ -367,7 +396,7 @@
     window.saveToFirebase = async function(data) {
         const statusEl = document.getElementById('db-status');
         if (!db) {
-            if(statusEl) statusEl.innerHTML = `<span class="text-red-400">DB 연결 실패 (로컬에서만 확인 가능)</span>`;
+            if(statusEl) statusEl.innerHTML = `<span class="text-red-400 font-bold">DB 연결 실패 (로컬에서만 확인 가능)</span>`;
             return;
         }
         try {
@@ -376,11 +405,11 @@
                 createdAt: serverTimestamp()
             });
             if(statusEl) {
-                statusEl.innerHTML = `<span class="text-green-400"><i class="fa-solid fa-check"></i> 서버 전송 완료</span>`;
+                statusEl.innerHTML = `<span class="text-green-400 font-bold"><i class="fa-solid fa-cloud-arrow-up mr-1"></i>Firestore 서버 전송 완료!</span>`;
             }
         } catch (e) {
             if(statusEl) {
-                statusEl.innerHTML = `<span class="text-red-400">저장 실패: ${e.message}</span>`;
+                statusEl.innerHTML = `<span class="text-red-400 font-bold">저장 실패: ${e.message}</span>`;
             }
         }
     };
